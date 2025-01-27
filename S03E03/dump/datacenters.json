@@ -1,0 +1,56 @@
+[
+    {
+        "dc_id": "8547",
+        "location": "Warszawa",
+        "manager": "22",
+        "is_active": "0"
+    },
+    {
+        "dc_id": "1226",
+        "location": "Kraków",
+        "manager": "44",
+        "is_active": "1"
+    },
+    {
+        "dc_id": "6491",
+        "location": "Wrocław",
+        "manager": "31",
+        "is_active": "1"
+    },
+    {
+        "dc_id": "9775",
+        "location": "Poznań",
+        "manager": "69",
+        "is_active": "0"
+    },
+    {
+        "dc_id": "1405",
+        "location": "Łódź",
+        "manager": "13",
+        "is_active": "1"
+    },
+    {
+        "dc_id": "3698",
+        "location": "Działdowo",
+        "manager": "33",
+        "is_active": "0"
+    },
+    {
+        "dc_id": "4278",
+        "location": "Gdańsk",
+        "manager": "28",
+        "is_active": "1"
+    },
+    {
+        "dc_id": "9294",
+        "location": "Grudziądz",
+        "manager": "28",
+        "is_active": "1"
+    },
+    {
+        "dc_id": "5637",
+        "location": "Pcim",
+        "manager": "20",
+        "is_active": "1"
+    }
+]
