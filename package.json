@@ -2,6 +2,7 @@
     "dependencies": {
         "@dotenvx/dotenvx": "dotenvx/dotenvx",
         "axios": "^1.7.9",
-        "openai": "^4.79.4"
+        "openai": "^4.79.4",
+        "remove-accents": "^0.5.0"
     }
 }
