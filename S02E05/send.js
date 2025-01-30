@@ -1,5 +1,3 @@
-import fs from "node:fs";
-
 const response = await fetch("https://centrala.ag3nts.org/report", {
     method: "POST",
     body: JSON.stringify({
