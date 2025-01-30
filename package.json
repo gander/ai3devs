@@ -1,8 +1,15 @@
 {
+    "scripts": {
+        "check": "biome check",
+        "fix": "biome check --unsafe --write"
+    },
     "dependencies": {
         "@dotenvx/dotenvx": "dotenvx/dotenvx",
         "axios": "^1.7.9",
         "openai": "^4.79.4",
         "remove-accents": "^0.5.0"
+    },
+    "devDependencies": {
+        "@biomejs/biome": "1.9.4"
     }
 }
