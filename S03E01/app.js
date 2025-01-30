@@ -1,6 +1,6 @@
-import OpenAI from 'openai';
-import fs from 'fs/promises';
-import path from 'path';
+import fs from "node:fs/promises";
+import path from "node:path";
+import OpenAI from "openai";
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
@@ -13,21 +13,25 @@ async function processReports(reportsDir, factsDir) {
         const reports = await readFiles(reportsDir);
 
         const messages = [
-            { role: 'system', content: 'Jesteś ekspertem w analizie tekstu i generowaniu słów kluczowych.' },
-            { role: 'user', content: promptContent },
-            { role: 'user', content: `Fakty:\n${facts.join('\n')}` },
-            { role: 'user', content: `Raporty:\n${reports.join('\n')}` },
+            {
+                role: "system",
+                content:
+                    "Jesteś ekspertem w analizie tekstu i generowaniu słów kluczowych.",
+            },
+            { role: "user", content: promptContent },
+            { role: "user", content: `Fakty:\n${facts.join("\n")}` },
+            { role: "user", content: `Raporty:\n${reports.join("\n")}` },
         ];
 
         const completion = await openai.chat.completions.create({
-            model: 'gpt-4o',
+            model: "gpt-4o",
             messages: messages,
         });
 
         const result = parseResponse(completion.choices[0].message.content);
         console.log(JSON.stringify(result, null, 2));
     } catch (error) {
-        console.error('Wystąpił błąd:', error);
+        console.error("Wystąpił błąd:", error);
     }
 }
 
@@ -35,9 +39,12 @@ async function readFiles(directory) {
     const files = await fs.readdir(directory);
     const fileContents = await Promise.all(
         files.map(async (file) => {
-            const content = await fs.readFile(path.join(directory, file), 'utf-8');
+            const content = await fs.readFile(
+                path.join(directory, file),
+                "utf-8",
+            );
             return `${file}:\n${content}`;
-        })
+        }),
     );
     return fileContents;
 }
@@ -79,17 +86,17 @@ Na koniec wygeneruj podobne listy słów kluczowych dla pozostałych raportów. 
 }
 
 function parseResponse(response) {
-    const jsonStart = response.indexOf('{');
-    const jsonEnd = response.lastIndexOf('}');
+    const jsonStart = response.indexOf("{");
+    const jsonEnd = response.lastIndexOf("}");
     if (jsonStart === -1 || jsonEnd === -1) {
-        throw new Error('Nie znaleziono poprawnego formatu JSON w odpowiedzi.');
+        throw new Error("Nie znaleziono poprawnego formatu JSON w odpowiedzi.");
     }
     const jsonString = response.slice(jsonStart, jsonEnd + 1);
     return JSON.parse(jsonString);
 }
 
 // Użycie funkcji
-const reportsDir = './dane/reports';
-const factsDir = './dane/facts';
+const reportsDir = "./dane/reports";
+const factsDir = "./dane/facts";
 
 await processReports(reportsDir, factsDir);

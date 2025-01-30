@@ -1,46 +1,46 @@
-import removeAccents from 'remove-accents';
-import OpenAI from 'openai';
+import OpenAI from "openai";
+import unidecode from "unidecode";
 
 export const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
+    apiKey: process.env.OPENAI_API_KEY,
 });
 
 export async function sendReport(task, answer) {
-    return new Promise(async (resolve) => {
-
-        const response = await fetch('https://centrala.ag3nts.org/report', {
-            method: 'POST',
+    return new Promise((resolve) => {
+        fetch("https://centrala.ag3nts.org/report", {
+            method: "POST",
             body: JSON.stringify({
-                "task": task,
-                "apikey": process.env.AZYL_API_KEY,
-                "answer": answer
+                task: task,
+                apikey: process.env.AZYL_API_KEY,
+                answer: answer,
             }),
-        });
-
-        const reply = await response.text()
-        console.log(reply);
-        resolve(reply);
+        })
+            .then((response) => response.text())
+            .then((reply) => {
+                console.log(reply);
+                resolve(reply);
+            });
     });
 }
 
 export async function sendQueryPathNamed(query, path) {
-    return new Promise(async (resolve, reject) => {
-        const response = await fetch(`https://centrala.ag3nts.org/${path}`, {
-            method: 'POST',
+    return new Promise((resolve, reject) => {
+        fetch(`https://centrala.ag3nts.org/${path}`, {
+            method: "POST",
             body: JSON.stringify({
-                "apikey": process.env.AZYL_API_KEY,
-                "query": query
-            })
+                apikey: process.env.AZYL_API_KEY,
+                query: query,
+            }),
         })
-
-        const {code, message} = await response.json();
-
-        if (code === 0) {
-            resolve(message);
-        } else {
-            reject(`ERROR ${code}: ${message}`);
-        }
-    })
+            .then((response) => response.json())
+            .then(({ code, message }) => {
+                if (code === 0) {
+                    resolve(message);
+                } else {
+                    reject(`ERROR ${code}: ${message}`);
+                }
+            });
+    });
 }
 
 export class MemoryQueue {
@@ -48,7 +48,9 @@ export class MemoryQueue {
         this.queue = [];
         this.set = new Set();
 
-        initial.forEach(v => this.enqueue(v))
+        for (const v of initial) {
+            this.enqueue(v);
+        }
     }
 
     enqueue(element) {
@@ -108,17 +110,17 @@ export async function extractNamesAndCities(note) {
         model: "gpt-4",
         messages: [{ role: "user", content: prompt }],
         temperature: 0.3,
-        max_tokens: 150
+        max_tokens: 150,
     });
 
-    const {people, places} = JSON.parse(response.choices[0].message.content);
-    return {people, places};
+    const { people, places } = JSON.parse(response.choices[0].message.content);
+    return { people, places };
 }
 
 export function transliterate(text) {
-    return removeAccents(text);
+    return unidecode(text);
 }
 
 export async function wait(timeout) {
-    return new Promise(resolve => setTimeout(resolve, timeout))
+    return new Promise((resolve) => setTimeout(resolve, timeout));
 }

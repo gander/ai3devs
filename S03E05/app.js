@@ -1,3 +1,3 @@
-import {sendReport} from "../lib";
+import { sendReport } from "../lib";
 
-await sendReport('connections', 'Rafał, Azazel, Aleksander, Barbara')
+await sendReport("connections", "Rafał, Azazel, Aleksander, Barbara");

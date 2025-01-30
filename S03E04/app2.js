@@ -1,25 +1,18 @@
-import {sendQueryPathNamed, wait} from "../lib";
-import {appendFile} from "fs/promises";
+import { appendFile } from "node:fs/promises";
+import { sendQueryPathNamed, wait } from "../lib";
 
-const miasta = [
-    "KONIN",
-    "FROMBORK",
-    "GLITCH",
-    "GRUDZIADZ",
-    "CIECHOCINEK",
-];
+const miasta = ["KONIN", "FROMBORK", "GLITCH", "GRUDZIADZ", "CIECHOCINEK"];
 
 const queryPlaces = async (place) => {
-    let response = '';
+    let response = "";
     try {
-        response = await sendQueryPathNamed(place, 'places');
+        response = await sendQueryPathNamed(place, "places");
     } catch (e) {
         response = e;
     }
-    await appendFile('./dane/dump2.log', `${place}: ${response}\n`);
+    await appendFile("./dane/dump2.log", `${place}: ${response}\n`);
     console.log(place, response);
 };
-
 
 for (const miasto of miasta) {
     await queryPlaces(miasto);

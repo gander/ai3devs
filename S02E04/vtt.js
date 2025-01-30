@@ -1,6 +1,6 @@
+import fs from "node:fs/promises";
+import { extname } from "node:path";
 import OpenAI from "openai";
-import fs from "fs/promises";
-import {extname} from "node:path";
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
@@ -10,7 +10,7 @@ async function ekstrahujTekstZObrazu(sciezkaDoPliku) {
     try {
         // Wczytaj obraz i zakoduj go w base64
         const buforObrazu = await fs.readFile(sciezkaDoPliku);
-        const obrazBase64 = buforObrazu.toString('base64');
+        const obrazBase64 = buforObrazu.toString("base64");
         const zakodowanyObraz = `data:image/png;base64,${obrazBase64}`;
 
         // Wywołaj API OpenAI
@@ -20,8 +20,14 @@ async function ekstrahujTekstZObrazu(sciezkaDoPliku) {
                 {
                     role: "user",
                     content: [
-                        {type: "text", text: "Odczytaj i zwróć cały tekst widoczny na tym obrazie. Tylko tekst widoczny na obrazie, bez dodatkowych informacji."},
-                        {type: "image_url", image_url: {url: zakodowanyObraz}},
+                        {
+                            type: "text",
+                            text: "Odczytaj i zwróć cały tekst widoczny na tym obrazie. Tylko tekst widoczny na obrazie, bez dodatkowych informacji.",
+                        },
+                        {
+                            type: "image_url",
+                            image_url: { url: zakodowanyObraz },
+                        },
                     ],
                 },
             ],
@@ -36,16 +42,13 @@ async function ekstrahujTekstZObrazu(sciezkaDoPliku) {
     }
 }
 
+const files = await fs.readdir("./raporty");
 
-const files = await fs.readdir('./raporty');
-
-const images = files.filter(file => extname(file).toLowerCase() === '.png');
+const images = files.filter((file) => extname(file).toLowerCase() === ".png");
 
 for await (const file of images) {
+    const transcription = await ekstrahujTekstZObrazu(`./raporty/${file}`);
 
-    const transcription = await ekstrahujTekstZObrazu('./raporty/' + file);
-
-
-    await fs.writeFile('./raporty/' + file + '.txt', transcription);
+    await fs.writeFile(`./raporty/${file}.txt`, transcription);
     console.log(file);
 }

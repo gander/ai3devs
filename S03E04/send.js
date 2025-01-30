@@ -1,3 +1,3 @@
-import {sendReport} from "../lib";
+import { sendReport } from "../lib";
 
-await sendReport('loop', 'ELBLAG')
+await sendReport("loop", "ELBLAG");

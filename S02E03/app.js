@@ -1,34 +1,27 @@
-const axios = require('axios');
-
-const generujObraz = async (opis) => {
-    const apiKey = process.env.OPENAI_API_KEY;
-    const url = 'https://api.openai.com/v1/images/generations';
-
-    try {
-        const odpowiedz = await axios.post(url, {
-            model: "dall-e-3",
-            prompt: opis,
-            n: 1,
-            size: "1024x1024",
-            quality: "standard",
-            style: "vivid",
-        }, {
+const generujObraz = (opis) =>
+    new Promise((resolve, reject) =>
+        fetch("https://api.openai.com/v1/images/generations", {
+            method: "POST",
             headers: {
-                'Authorization': `Bearer ${apiKey}`,
-                'Content-Type': 'application/json',
+                Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+                "Content-Type": "application/json",
             },
-        });
+            body: JSON.stringify({
+                model: "dall-e-3",
+                prompt: opis,
+                n: 1,
+                size: "1024x1024",
+                quality: "standard",
+                style: "vivid",
+            }),
+        })
+            .then((response) => response.json())
+            .then((response) => resolve(response.data[0].url))
+            .catch(reject),
+    );
 
-        const urlObrazu = odpowiedz.data.data[0].url;
-        console.log(`Wygenerowany obraz: ${urlObrazu}`);
-        return urlObrazu;
-    } catch (blad) {
-        console.error('Wystąpił błąd podczas generowania obrazu:', blad);
-        throw blad;
-    }
-};
+generujObraz("Pięciogłowa hydra z 'Age of Wonders 4'")
+    .then((url) => console.log(`Obraz został wygenerowany: ${url}`))
+    .catch((err) => console.error("Błąd:", err));
 
-// Przykładowe użycie
-generujObraz("Kolorowy parasol na plaży, aparat jednorazowy")
-    .then(url => console.log(`Obraz został wygenerowany: ${url}`))
-    .catch(blad => console.error('Błąd:', blad));
+
