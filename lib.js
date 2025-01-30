@@ -1,3 +1,5 @@
+import fsSync from "node:fs";
+import path from "node:path";
 import OpenAI from "openai";
 import unidecode from "unidecode";
 
@@ -123,4 +125,12 @@ export function transliterate(text) {
 
 export async function wait(timeout) {
     return new Promise((resolve) => setTimeout(resolve, timeout));
+}
+
+export function writeFileSync(dir, file, content) {
+    fsSync.writeFileSync(path.join(dir, file), content);
+}
+
+export function readFileSync(dir, file) {
+    return fsSync.readFileSync(path.join(dir, file));
 }

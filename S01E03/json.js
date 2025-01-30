@@ -1,5 +1,5 @@
-import fs from "node:fs";
 import { evaluate } from "mathjs";
+import { readFileSync, writeFileSync } from "../lib";
 
 async function ask(content) {
     return new Promise((resolve, reject) => {
@@ -35,13 +35,13 @@ async function ask(content) {
     });
 }
 
-const input = JSON.parse(fs.readFileSync("json.txt").toString());
+const input = JSON.parse(readFileSync(__dirname, "json.txt").toString());
 
-for (let i = 0; i < input["test-data"].length; i++) {
+for (const i in input["test-data"]) {
     input["test-data"][i].answer = evaluate(input["test-data"][i].question);
     if (input["test-data"][i].test) {
         input["test-data"][i].test.a = await ask(input["test-data"][i].test.q);
     }
 }
 
-fs.writeFileSync("json2.txt", JSON.stringify(input, undefined, 2));
+writeFileSync(__dirname, "json2.txt", JSON.stringify(input, undefined, 2));
