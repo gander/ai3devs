@@ -23,5 +23,3 @@ const generujObraz = (opis) =>
 generujObraz("Pięciogłowa hydra z 'Age of Wonders 4'")
     .then((url) => console.log(`Obraz został wygenerowany: ${url}`))
     .catch((err) => console.error("Błąd:", err));
-
-
