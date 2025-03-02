@@ -1,6 +1,7 @@
 {
     "scripts": {
         "app": "dotenvx run -- bun",
+        "app-watch": "dotenvx run -- bun --watch",
         "check": "biome check",
         "fix": "biome check --unsafe --write",
         "AZYL_API_KEY": "dotenvx get AZYL_API_KEY",
@@ -8,6 +9,7 @@
         "OPENAI_API_KEY": "dotenvx get OPENAI_API_KEY"
     },
     "dependencies": {
+        "express": "^5.0.1",
         "mathjs": "^14.3.0",
         "openai": "^4.86.1",
         "unidecode": "^1.1.0"
