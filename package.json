@@ -2,16 +2,19 @@
     "scripts": {
         "app": "dotenvx run -- bun",
         "check": "biome check",
-        "fix": "biome check --unsafe --write"
+        "fix": "biome check --unsafe --write",
+        "AZYL_API_KEY": "dotenvx get AZYL_API_KEY",
+        "PPLX_API_KEY": "dotenvx get PPLX_API_KEY",
+        "OPENAI_API_KEY": "dotenvx get OPENAI_API_KEY"
     },
     "dependencies": {
-        "mathjs": "^14.2.0",
-        "openai": "^4.81.0",
+        "mathjs": "^14.3.0",
+        "openai": "^4.86.1",
         "unidecode": "^1.1.0"
     },
     "devDependencies": {
         "@biomejs/biome": "1.9.4",
-        "@dotenvx/dotenvx": "^1.34.0",
-        "lefthook": "^1.10.10"
+        "@dotenvx/dotenvx": "^1.38.3",
+        "lefthook": "^1.11.2"
     }
 }
