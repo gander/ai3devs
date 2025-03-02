@@ -1,4 +1,5 @@
 import fsSync from "node:fs";
+import fs from "node:fs/promises";
 import path from "node:path";
 import OpenAI from "openai";
 import unidecode from "unidecode";
@@ -7,7 +8,7 @@ export const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 });
 
-export async function sendReport(task, answer) {
+export async function sendReport(task, answer, isJson = false, debug = false) {
     return new Promise((resolve) => {
         fetch("https://centrala.ag3nts.org/report", {
             method: "POST",
@@ -17,9 +18,11 @@ export async function sendReport(task, answer) {
                 answer: answer,
             }),
         })
-            .then((response) => response.text())
+            .then((response) => (isJson ? response.json() : response.text()))
             .then((reply) => {
-                console.log(reply);
+                if (debug) {
+                    console.log(reply);
+                }
                 resolve(reply);
             });
     });
@@ -133,4 +136,196 @@ export function writeFileSync(dir, file, content) {
 
 export function readFileSync(dir, file) {
     return fsSync.readFileSync(path.join(dir, file));
+}
+
+export function prepareChat(systemContent, ...userContents) {
+    const messages = [
+        {
+            role: "system",
+            content: systemContent,
+        },
+    ];
+
+    for (const userContent of userContents) {
+        if (userContent) {
+            messages.push({
+                role: "user",
+                content: userContent,
+            });
+        }
+    }
+
+    return async (content) => {
+        const body = {
+            model: "gpt-4o",
+            messages: [
+                ...messages,
+                {
+                    role: "user",
+                    content,
+                },
+            ],
+        };
+
+        // return JSON.stringify({body}, undefined, 2)
+
+        const completion = await openai.chat.completions.create(body);
+        return JSON.parse(completion.choices[0].message.content);
+    };
+}
+
+export function dbS04E01(initial) {
+    const REPAIR = "REPAIR";
+    const DARKEN = "DARKEN";
+    const BRIGHTEN = "BRIGHTEN";
+    const DONE = "DONE";
+
+    const storage = new Map();
+
+    function add(image) {
+        !has(image) &&
+            storage.set(
+                image,
+                new Map([
+                    [REPAIR, null],
+                    [DARKEN, null],
+                    [BRIGHTEN, null],
+                    [DONE, false],
+                ]),
+            );
+    }
+
+    function has(image) {
+        return storage.has(image);
+    }
+
+    function up(image, state, value) {
+        storage.get(image).set(state, value);
+    }
+
+    function is(image, state) {
+        return storage.get(image).get(state);
+    }
+
+    function dump() {
+        return Object.fromEntries(
+            storage
+                .entries()
+                .map(([key, value]) => [
+                    key,
+                    Object.fromEntries(value.entries()),
+                ]),
+        );
+    }
+
+    function extract(text) {
+        for (const image of text.match(/IMG_.[^.]+\.PNG/g)) {
+            add(image);
+        }
+    }
+
+    async function eachState(callback, errorHandler) {
+        for (const key of [REPAIR, DARKEN, BRIGHTEN]) {
+            try {
+                await callback(key);
+            } catch (error) {
+                if (errorHandler) {
+                    errorHandler(error);
+                } else {
+                    throw error; // Propagacja błędu
+                }
+            }
+        }
+    }
+
+    async function eachImage(callback, errorHandler) {
+        for (const key of storage.keys()) {
+            try {
+                await callback(key);
+            } catch (error) {
+                if (errorHandler) {
+                    errorHandler(error);
+                } else {
+                    throw error; // Propagacja błędu
+                }
+            }
+        }
+    }
+
+    async function allDone() {
+        return new Promise((resolve) => {
+            for (const item of storage.values()) {
+                if (!item.get(DONE)) {
+                    resolve(false);
+                }
+            }
+
+            resolve(true);
+        });
+    }
+
+    function url(image) {
+        return `https://centrala.ag3nts.org/dane/barbara/${image}`;
+    }
+
+    extract(initial);
+
+    return {
+        add,
+        up,
+        is,
+        dump,
+        extract,
+        has,
+        eachState,
+        DONE,
+        allDone,
+        eachImage,
+        url,
+    };
+}
+
+export function getTextFromAudio(stream) {
+    return openai.audio.transcriptions.create({
+        file: stream,
+        model: "whisper-1",
+        response_format: "text",
+    });
+}
+
+export async function readRemoteStreamToBuffer(url) {
+    const response = await fetch(url);
+    const arrayBuffer = await response.arrayBuffer();
+    return Buffer.from(arrayBuffer);
+}
+
+export async function readLocalStreamToBuffer(path) {
+    return await fs.readFile(path);
+}
+
+export async function processImage(buforObrazu, prompt) {
+    const obrazBase64 = buforObrazu.toString("base64");
+    const zakodowanyObraz = `data:image/png;base64,${obrazBase64}`;
+
+    const response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+            {
+                role: "user",
+                content: [
+                    {
+                        type: "text",
+                        text: prompt,
+                    },
+                    {
+                        type: "image_url",
+                        image_url: { url: zakodowanyObraz },
+                    },
+                ],
+            },
+        ],
+        max_tokens: 300,
+    });
+
+    return response.choices[0].message.content;
 }
