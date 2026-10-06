@@ -10,7 +10,7 @@
     },
     "dependencies": {
         "express": "^5.0.1",
-        "mathjs": "^14.3.0",
+        "mathjs": "^15.2.0",
         "openai": "^4.86.1",
         "unidecode": "^1.1.0"
     },
